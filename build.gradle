@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.demo.mockclock'
+version = '0.0.1-SNAPSHOT'
+description = 'mock-clock'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun) {
+    mainClass.set('com.demo.mockclock.MockClockApplication')
+}
+
+tasks.withType(org.springframework.boot.gradle.tasks.bundling.BootJar) {
+    mainClass.set('com.demo.mockclock.MockClockApplication')
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Live Clock</title>
+    <style>
+        body {
+            font-family: Arial;
+            font-size: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="metric">loading...</div>
+
+    <script>
+        async function load() {
+            try {
+                const res = await fetch('/metric/calories_us_daily');
+                const data = await res.json();
+                const seed = data.seedValue;
+                const rate = data.growthPerSecond;
+                const updatedAt = new Date(data.updatedAt);
+
+                const valueEl = document.getElementById('metric');
+
+                function render() {
+                    const now = new Date();
+                    const deltaSec = (now - updatedAt) / 1000;
+                    const current = seed + (rate * deltaSec);
+                    valueEl.innerText = Math.floor(current).toLocaleString();
+                }
+                render();
+                setInterval(render, 100);
+
+            } catch (err){
+                console.error(err);
+                document.getElementById('metric').innerText = "Error fetching metric";
+            }
+
+        }
+
+        load();
+    </script>
+</body>
+</html>
