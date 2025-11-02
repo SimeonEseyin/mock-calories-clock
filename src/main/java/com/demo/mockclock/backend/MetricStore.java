@@ -27,10 +27,11 @@ public class MetricStore {
     private void load() {
         if (!file.exists()) return;
         try {
-            MetricResponse[] arr = mapper.readValue(file, MetricResponse[].class);
-            for (MetricResponse m : arr) {
-                metrics.put(m.metricName(), m);
-            }
+            Map<String, MetricResponse> map = mapper.readValue(
+                    file,
+                    mapper.getTypeFactory().constructMapType(Map.class, String.class, MetricResponse.class)
+            );
+            metrics.putAll(map);
             System.out.println("MetricStore loaded " + metrics.size() + " metrics");
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,7 +40,7 @@ public class MetricStore {
 
     public void save() {
         try {
-            mapper.writeValue(file, metrics.values());
+            mapper.writeValue(file, metrics);
         } catch (IOException e) {
             e.printStackTrace();
         }

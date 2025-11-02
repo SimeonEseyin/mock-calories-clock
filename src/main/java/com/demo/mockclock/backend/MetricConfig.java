@@ -14,9 +14,7 @@ public class MetricConfig {
     private Map<String, MetricDefinition> definitions = new HashMap<>();
 
     public MetricConfig() {
-        load(); //load from metric.json
-        System.out.println("metrics loaded keys=" + definitions.keySet());
-
+        load(); //load from metric_definitions.json
     }
 
     private void load() {

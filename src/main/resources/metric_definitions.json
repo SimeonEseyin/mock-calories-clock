@@ -8,5 +8,10 @@
     "name": "US Water Consumed Today",
     "seedValue": 20000000,
     "growthPerSecond": 3000
+  },
+  "energy_us_daily": {
+    "name": "US Energy Consumed Today",
+    "seedValue": 1230000000,
+    "growthPerSecond": 13000
   }
 }
