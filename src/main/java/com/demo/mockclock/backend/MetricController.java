@@ -1,8 +1,11 @@
 package com.demo.mockclock;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +28,23 @@ public class MetricController {
      */
     @GetMapping("/metric/{metricKey}")
     public MetricResponse getMetric(@PathVariable String metricKey) {
-        MetricDefinition def = config.getDefinition(metricKey);
-        if (def == null) {
-            throw new IllegalArgumentException("Unknown metric: " + metricKey);
-        }
-
+        // Try to get the metric from the store first
         MetricResponse current = store.getMetric(metricKey);
+
+        // Only use the definition as default if it doesn't exist in the store
         if (current == null) {
-            current = new MetricResponse(def.getName(), def.getSeedValue(), def.getGrowthPerSecond(), Instant.now());
+            MetricDefinition def = config.getDefinition(metricKey);
+            if (def != null) {
+                current = new MetricResponse(
+                        metricKey,
+                        def.getName(),
+                        def.getSeedValue(),
+                        def.getGrowthPerSecond(),
+                        Instant.now()
+                );
+            } else {
+                throw new IllegalArgumentException("Unknown metric: " + metricKey);
+            }
         }
 
         // update seed based on elapsed time
@@ -40,7 +52,7 @@ public class MetricController {
         long elapsedSeconds = Duration.between(current.updatedAt(), now).getSeconds();
         long newSeedValue = current.seedValue() + current.growthPerSecond() * elapsedSeconds;
 
-        MetricResponse updated = new MetricResponse(def.getName(), newSeedValue, def.getGrowthPerSecond(), now);
+        MetricResponse updated = new MetricResponse(current.metricKey(), current.metricName(), newSeedValue, current.growthPerSecond(), now);
         store.updateMetric(metricKey, updated);
 
         log.info("GET /metric/{} -> {}", metricKey, updated);
@@ -62,4 +74,27 @@ public class MetricController {
     public Collection<MetricDefinition> listMetricDefinitions() {
         return config.getAllDefinitions().values();
     }
+
+    @PutMapping("/metric/{metricKey}")
+    public MetricResponse updateMetric(
+            @PathVariable String metricKey,
+            @RequestBody MetricResponse req
+    ){
+        MetricResponse existing = store.getMetric(metricKey);
+        if (existing == null) throw new IllegalArgumentException("Unknown metric: " + metricKey);
+
+        Instant now = Instant.now();
+
+        MetricResponse updated = new MetricResponse(
+                metricKey,
+                req.metricName(),
+                req.seedValue(),
+                req.growthPerSecond(),
+                now
+        );
+
+        store.updateMetric(metricKey, updated);
+        return updated;
+    }
+
 }

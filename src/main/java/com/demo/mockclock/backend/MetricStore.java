@@ -40,7 +40,7 @@ public class MetricStore {
 
     public void save() {
         try {
-            mapper.writeValue(file, metrics);
+            mapper.writeValue(file, metrics.values());
         } catch (IOException e) {
             e.printStackTrace();
         }
