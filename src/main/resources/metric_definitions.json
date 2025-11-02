@@ -1,0 +1,12 @@
+{
+  "calories_us_daily": {
+    "name": "US Calories Burned Today",
+    "seedValue": 604800000000,
+    "growthPerSecond": 7000000
+  },
+  "water_us_daily": {
+    "name": "US Water Consumed Today",
+    "seedValue": 20000000,
+    "growthPerSecond": 3000
+  }
+}

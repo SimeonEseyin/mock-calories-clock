@@ -5,46 +5,96 @@
     <title>Mock Live Clock</title>
     <style>
         body {
-            font-family: Arial;
-            font-size: 48px;
+            font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
         }
+        #metricValue {
+            font-size: 48px;
+            margin-top: 20px;
+        }
+        select {
+            font-size: 20px;
+            padding: 5px 10px;
+        }
     </style>
 </head>
 <body>
-    <div id="metric">loading...</div>
+<h1>Mock Live Clock</h1>
+<select id="metricSelect">
+    <option value="">Loading metrics...</option>
+</select>
+<div id="metricValue">loading...</div>
 
-    <script>
-        async function load() {
-            try {
-                const res = await fetch('/metric/calories_us_daily');
-                const data = await res.json();
-                const seed = data.seedValue;
-                const rate = data.growthPerSecond;
-                const updatedAt = new Date(data.updatedAt);
+<script>
+    let currentData = null;
+    let timerId = null;
 
-                const valueEl = document.getElementById('metric');
+    // Fetch available metrics and populate dropdown
+    async function loadMetrics() {
+        try {
+            const res = await fetch('/metrics');
+            const keys = await res.json();
 
-                function render() {
-                    const now = new Date();
-                    const deltaSec = (now - updatedAt) / 1000;
-                    const current = seed + (rate * deltaSec);
-                    valueEl.innerText = Math.floor(current).toLocaleString();
-                }
-                render();
-                setInterval(render, 100);
+            const select = document.getElementById('metricSelect');
+            select.innerHTML = ''; // clear placeholder
 
-            } catch (err){
-                console.error(err);
-                document.getElementById('metric').innerText = "Error fetching metric";
+            keys.forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = key;
+                select.appendChild(option);
+            });
+
+            // load first metric by default
+            if (keys.length > 0) {
+                select.value = keys[0];
+                loadMetric(keys[0]);
             }
 
-        }
+            // add change listener
+            select.addEventListener('change', (e) => {
+                loadMetric(e.target.value);
+            });
 
-        load();
-    </script>
+        } catch (err) {
+            console.error(err);
+            document.getElementById('metricValue').innerText = "Error fetching metric list";
+        }
+    }
+
+    // Load a metric by key
+    async function loadMetric(metricKey) {
+        try {
+            const res = await fetch(`/metric/${metricKey}`);
+            const data = await res.json();
+            currentData = data;
+
+            if (timerId) clearInterval(timerId);
+
+            const valueEl = document.getElementById('metricValue');
+
+            function render() {
+                const now = new Date();
+                const updatedAt = new Date(currentData.updatedAt);
+                const deltaSec = (now - updatedAt) / 1000;
+                const current = currentData.seedValue + (currentData.growthPerSecond * deltaSec);
+                valueEl.innerText = Math.floor(current).toLocaleString();
+            }
+
+            render();
+            timerId = setInterval(render, 100);
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('metricValue').innerText = "Error fetching metric";
+        }
+    }
+
+    loadMetrics();
+</script>
 </body>
 </html>

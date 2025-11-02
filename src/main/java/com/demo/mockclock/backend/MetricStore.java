@@ -1,0 +1,56 @@
+package com.demo.mockclock;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MetricStore {
+
+    private final File file = new File("metric_values.json");
+    private final ObjectMapper mapper;
+    private Map<String, MetricResponse> metrics = new HashMap<>();
+
+    public MetricStore() {
+        // ← create mapper WITH modules
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        load();
+    }
+
+    private void load() {
+        if (!file.exists()) return;
+        try {
+            MetricResponse[] arr = mapper.readValue(file, MetricResponse[].class);
+            for (MetricResponse m : arr) {
+                metrics.put(m.metricName(), m);
+            }
+            System.out.println("MetricStore loaded " + metrics.size() + " metrics");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void save() {
+        try {
+            mapper.writeValue(file, metrics.values());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MetricResponse getMetric(String name) {
+        return metrics.get(name);
+    }
+
+    public void updateMetric(String name, MetricResponse updated) {
+        metrics.put(name, updated);
+        save();
+    }
+}
