@@ -1,1 +1,31 @@
-[{"metricKey":"calories_us_daily","metricName":"US Calories Burned Today","seedValue":610526000000,"growthPerSecond":7000000,"updatedAt":"2025-11-02T21:26:58.279386Z"},{"metricKey":"water_us_daily","metricName":"US Water Consumed Today","seedValue":33629000,"growthPerSecond":5500,"updatedAt":"2025-11-02T21:24:58.466389Z"}]
+[ {
+  "metricKey" : null,
+  "metricName" : "US Water Consumed Today",
+  "seedValue" : 31,
+  "growthPerSecond" : 500,
+  "updatedAt" : "2025-11-02T22:13:56.366508Z"
+}, {
+  "metricKey" : "",
+  "metricName" : "US Water Consumed Today",
+  "seedValue" : 31,
+  "growthPerSecond" : 500,
+  "updatedAt" : "2025-11-02T22:13:22.317462Z"
+}, {
+  "metricKey" : "water_us_daily",
+  "metricName" : "US Water Consumed Today",
+  "seedValue" : 31000000,
+  "growthPerSecond" : 5500,
+  "updatedAt" : "2025-11-02T22:12:17.302232Z"
+}, {
+  "metricKey" : "calories_us_daily",
+  "metricName" : "US Calories Burned Today",
+  "seedValue" : 606746000000,
+  "growthPerSecond" : 7000000,
+  "updatedAt" : "2025-11-02T22:09:21.226605Z"
+}, {
+  "metricKey" : "null",
+  "metricName" : "US Water Consumed Today",
+  "seedValue" : 31,
+  "growthPerSecond" : 500,
+  "updatedAt" : "2025-11-02T22:13:01.265093Z"
+} ]

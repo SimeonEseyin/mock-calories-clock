@@ -2,6 +2,7 @@ package com.demo.mockclock;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,6 +96,20 @@ public class MetricController {
 
         store.updateMetric(metricKey, updated);
         return updated;
+    }
+
+    @PostMapping("/metric")
+    public MetricResponse createOrReplaceMetric(@RequestBody MetricResponse req) {
+        Instant now = Instant.now();
+        MetricResponse newValue = new MetricResponse(
+                req.metricKey(),
+                req.metricName(),
+                req.seedValue(),
+                req.growthPerSecond(),
+                now  // timestamp set by server
+        );
+        store.updateMetric(req.metricKey(), newValue);
+        return newValue;
     }
 
 }

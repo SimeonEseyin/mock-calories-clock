@@ -3,6 +3,7 @@ package com.demo.mockclock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +28,7 @@ public class MetricStore {
     private void load() {
         if (!file.exists()) return;
         try {
-            Map<String, MetricResponse> map = mapper.readValue(
-                    file,
-                    mapper.getTypeFactory().constructMapType(Map.class, String.class, MetricResponse.class)
-            );
-            metrics.putAll(map);
+            metrics = mapper.readValue(file, new TypeReference<Map<String, MetricResponse>>() {});
             System.out.println("MetricStore loaded " + metrics.size() + " metrics");
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,7 +37,7 @@ public class MetricStore {
 
     public void save() {
         try {
-            mapper.writeValue(file, metrics.values());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, metrics.values());
         } catch (IOException e) {
             e.printStackTrace();
         }
