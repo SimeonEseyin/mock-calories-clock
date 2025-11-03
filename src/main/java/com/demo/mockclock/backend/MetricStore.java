@@ -37,7 +37,7 @@ public class MetricStore {
 
     public void save() {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, metrics.values());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, metrics);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,8 +47,8 @@ public class MetricStore {
         return metrics.get(name);
     }
 
-    public void updateMetric(String name, MetricResponse updated) {
-        metrics.put(name, updated);
+    public void updateMetric(String key, MetricResponse updated) {
+        metrics.put(key, updated);
         save();
     }
 

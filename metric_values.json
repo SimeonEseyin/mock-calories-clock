@@ -1,1 +1,14 @@
-[ ]
+{
+  "water_us_daily" : {
+    "metricName" : "Water used in US Today",
+    "seedValue" : 0,
+    "growthPerSecond" : 0,
+    "updatedAt" : "2025-11-03T20:44:19.947181Z"
+  },
+  "calories_us_daily" : {
+    "metricName" : "US Calories Burned Today",
+    "seedValue" : 1670000000,
+    "growthPerSecond" : 9000,
+    "updatedAt" : "2025-11-03T20:39:39.156810Z"
+  }
+}

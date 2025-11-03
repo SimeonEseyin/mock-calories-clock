@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.demo.mockclock.MetricStore;
+import com.demo.mockclock.MetricResponse;
+import com.demo.mockclock.MetricDefinition;
+import com.demo.mockclock.MetricCreateRequest;
+
 
 
 import org.slf4j.Logger;
@@ -38,7 +43,6 @@ public class MetricController {
             MetricDefinition def = config.getDefinition(metricKey);
             if (def != null) {
                 current = new MetricResponse(
-                        metricKey,
                         def.getName(),
                         def.getSeedValue(),
                         def.getGrowthPerSecond(),
@@ -54,7 +58,7 @@ public class MetricController {
         long elapsedSeconds = Duration.between(current.updatedAt(), now).getSeconds();
         long newSeedValue = current.seedValue() + current.growthPerSecond() * elapsedSeconds;
 
-        MetricResponse updated = new MetricResponse(current.metricKey(), current.metricName(), newSeedValue, current.growthPerSecond(), now);
+        MetricResponse updated = new MetricResponse( current.metricName(), newSeedValue, current.growthPerSecond(), now);
         store.updateMetric(metricKey, updated);
 
         log.info("GET /metric/{} -> {}", metricKey, updated);
@@ -88,7 +92,6 @@ public class MetricController {
         Instant now = Instant.now();
 
         MetricResponse updated = new MetricResponse(
-                metricKey,
                 req.metricName(),
                 req.seedValue(),
                 req.growthPerSecond(),
@@ -100,10 +103,12 @@ public class MetricController {
     }
 
     @PostMapping("/metric")
-    public MetricResponse createOrReplaceMetric(@RequestBody MetricResponse req) {
+    public MetricResponse createOrReplaceMetric(@RequestBody MetricCreateRequest req) {
+        if (req.metricKey() == null || req.metricKey().isBlank()) {
+            throw new IllegalArgumentException("metricKey is required");
+        }
         Instant now = Instant.now();
         MetricResponse newValue = new MetricResponse(
-                req.metricKey(),
                 req.metricName(),
                 req.seedValue(),
                 req.growthPerSecond(),
