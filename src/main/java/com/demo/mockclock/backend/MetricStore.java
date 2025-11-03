@@ -51,4 +51,10 @@ public class MetricStore {
         metrics.put(name, updated);
         save();
     }
+
+    /** Delete a metric by key */
+    public void deleteMetric(String key) {
+        metrics.remove(key);
+        save();
+    }
 }

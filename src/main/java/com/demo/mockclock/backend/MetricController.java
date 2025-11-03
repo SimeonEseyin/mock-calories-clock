@@ -3,6 +3,7 @@ package com.demo.mockclock;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -111,5 +112,11 @@ public class MetricController {
         store.updateMetric(req.metricKey(), newValue);
         return newValue;
     }
+
+    @DeleteMapping("/metric/{metricKey}")
+    public void deleteMetric(@PathVariable String metricKey) {
+        store.deleteMetric(metricKey);
+    }
+
 
 }
