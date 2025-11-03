@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +12,7 @@ import com.demo.mockclock.MetricStore;
 import com.demo.mockclock.MetricResponse;
 import com.demo.mockclock.MetricDefinition;
 import com.demo.mockclock.MetricCreateRequest;
-
+import com.demo.mockclock.MetricUpdateRequest;
 
 
 import org.slf4j.Logger;
@@ -122,6 +123,27 @@ public class MetricController {
     public void deleteMetric(@PathVariable String metricKey) {
         store.deleteMetric(metricKey);
     }
+
+    @PatchMapping("/metric/{metricKey}")
+    public MetricResponse updateMetricField(
+            @PathVariable String metricKey,
+            @RequestBody MetricUpdateRequest req
+    ) {
+        MetricResponse existing = store.getMetric(metricKey);
+        if (existing == null) throw new IllegalArgumentException("Unknown metric: " + metricKey);
+
+        // Keep old values if new ones are null
+        String newName = req.metricName() != null ? req.metricName() : existing.metricName();
+        long newSeed = req.seedValue() != null ? req.seedValue() : existing.seedValue();
+        long newGrowth = req.growthPerSecond() != null ? req.growthPerSecond() : existing.growthPerSecond();
+        Instant now = Instant.now();
+
+        MetricResponse updated = new MetricResponse(newName, newSeed, newGrowth, now);
+        store.updateMetric(metricKey, updated);
+
+        return updated;
+    }
+
 
 
 }
